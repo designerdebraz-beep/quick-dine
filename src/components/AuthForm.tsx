@@ -1,15 +1,12 @@
 import React, { useState } from "react";
 import { useAppContext } from "../context/AppContext.tsx";
-import { X, Mail, Lock, User, Phone, Sparkles } from "lucide-react";
+import { X, Mail, Lock, User, Phone } from "lucide-react";
 
 interface AuthFormProps {
     initialTab?: "login" | "register";
     onClose?: () => void;
     onSuccess?: () => void;
 }
-
-const DEMO_USER = { email: "demo@quedine.com", password: "user12345" };
-const DEMO_ADMIN = { email: "admin@quedine.com", password: "admin12345" };
 
 export default function AuthForm({ initialTab = "login", onClose, onSuccess }: AuthFormProps) {
     const { login, register, authError, clearAuthError } = useAppContext();
@@ -28,18 +25,6 @@ export default function AuthForm({ initialTab = "login", onClose, onSuccess }: A
         setPassword("");
         setPhone("");
         setIsOwner(false);
-    };
-
-    const handleDemoLogin = async (creds: { email: string; password: string }) => {
-        clearAuthError();
-        setFormLoading(true);
-        const success = await login(creds.email, creds.password);
-        setFormLoading(false);
-        if (success) {
-            resetForm();
-            onSuccess?.();
-            onClose?.();
-        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -210,31 +195,6 @@ export default function AuthForm({ initialTab = "login", onClose, onSuccess }: A
                                 </label>
                             </div>
                         )}
-                    </div>
-
-                    {/* Demo Login */}
-                    <div className="mt-6 p-3 bg-surface-container-low/60 rounded-md border border-outline-variant/20">
-                        <p className="text-[10px] font-medium tracking-wider uppercase text-black/55 mb-2 flex items-center gap-1.5">
-                            <Sparkles size={12} className="text-secondary" /> Demo Login (auto-fill)
-                        </p>
-                        <div className="flex gap-2">
-                            <button
-                                type="button"
-                                onClick={() => handleDemoLogin(DEMO_USER)}
-                                disabled={formLoading}
-                                className="flex-1 text-[10px] font-medium tracking-wider uppercase border border-outline-variant/50 hover:border-primary py-2 transition-colors cursor-pointer disabled:opacity-60"
-                            >
-                                DEMO USER
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => handleDemoLogin(DEMO_ADMIN)}
-                                disabled={formLoading}
-                                className="flex-1 text-[10px] font-medium tracking-wider uppercase border border-outline-variant/50 hover:border-primary py-2 transition-colors cursor-pointer disabled:opacity-60"
-                            >
-                                DEMO ADMIN
-                            </button>
-                        </div>
                     </div>
                 </div>
 

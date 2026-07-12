@@ -40,7 +40,7 @@ export default function App() {
                 <Route
                     path="/items/add"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute allowedRoles={["owner"]}>
                             <ItemsAdd />
                         </ProtectedRoute>
                     }
@@ -48,7 +48,7 @@ export default function App() {
                 <Route
                     path="/items/manage"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute allowedRoles={["owner"]}>
                             <ItemsManage />
                         </ProtectedRoute>
                     }

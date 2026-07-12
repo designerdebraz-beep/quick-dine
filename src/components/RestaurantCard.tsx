@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Star, MapPinIcon } from "lucide-react";
-import { imageUrl } from "../lib/api.js";
+import { imageUrl, FALLBACK_IMAGE } from "../lib/api.js";
 
 interface RestaurantCardProps {
     restaurant: {
@@ -37,6 +37,9 @@ export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
                 <img
                     src={imageUrl(restaurant.image)}
                     alt={restaurant.name}
+                    onError={(e) => {
+                        e.currentTarget.src = FALLBACK_IMAGE;
+                    }}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     loading="lazy"
                 />

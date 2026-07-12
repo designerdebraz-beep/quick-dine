@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Calendar, Users, Clock, MapPin } from "lucide-react";
-import { imageUrl } from "../../lib/api.js";
+import { imageUrl, FALLBACK_IMAGE } from "../../lib/api.js";
 
 interface BookingSummaryProps {
     restaurant: any;
@@ -19,7 +19,7 @@ export default function BookingSummary({ restaurant, date, slot, guests }: Booki
             {/* Restaurant Info Header */}
             <div className="flex gap-4">
                 <div className="w-24 h-24 overflow-hidden rounded-sm shrink-0">
-                    <img src={imageUrl(restaurant.image)} alt={restaurant.name} className="w-full h-full object-cover" />
+                    <img src={imageUrl(restaurant.image)} alt={restaurant.name} onError={(e) => { e.currentTarget.src = FALLBACK_IMAGE; }} className="w-full h-full object-cover" />
                 </div>
                 <div className="space-y-1">
                     <span className="text-[9px] text-secondary tracking-widest uppercase">{restaurant.cuisine}</span>

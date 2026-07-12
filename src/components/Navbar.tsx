@@ -105,21 +105,25 @@ export default function Navbar() {
                                         My Bookings
                                     </button>
 
-                                    <Link
-                                        to="/items/add"
-                                        className="flex items-center gap-3 px-4 py-2.5 text-xs text-black/55 hover:text-primary hover:bg-surface transition-colors cursor-pointer"
-                                    >
-                                        <Plus size={14} />
-                                        Add Venue
-                                    </Link>
+                                    {user.role === "owner" && (
+                                        <Link
+                                            to="/items/add"
+                                            className="flex items-center gap-3 px-4 py-2.5 text-xs text-black/55 hover:text-primary hover:bg-surface transition-colors cursor-pointer"
+                                        >
+                                            <Plus size={14} />
+                                            Add Venue
+                                        </Link>
+                                    )}
 
-                                    <Link
-                                        to="/items/manage"
-                                        className="flex items-center gap-3 px-4 py-2.5 text-xs text-black/55 hover:text-primary hover:bg-surface transition-colors cursor-pointer"
-                                    >
-                                        <LayoutDashboard size={14} />
-                                        Manage Venues
-                                    </Link>
+                                    {user.role === "owner" && (
+                                        <Link
+                                            to="/items/manage"
+                                            className="flex items-center gap-3 px-4 py-2.5 text-xs text-black/55 hover:text-primary hover:bg-surface transition-colors cursor-pointer"
+                                        >
+                                            <LayoutDashboard size={14} />
+                                            Manage Venues
+                                        </Link>
+                                    )}
 
                                     {user.role === "admin" && (
                                         <Link
