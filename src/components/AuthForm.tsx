@@ -1,0 +1,262 @@
+import React, { useState } from "react";
+import { useAppContext } from "../context/AppContext.tsx";
+import { X, Mail, Lock, User, Phone, Sparkles } from "lucide-react";
+
+interface AuthFormProps {
+    initialTab?: "login" | "register";
+    onClose?: () => void;
+    onSuccess?: () => void;
+}
+
+const DEMO_USER = { email: "demo@quedine.com", password: "user12345" };
+const DEMO_ADMIN = { email: "admin@quedine.com", password: "admin12345" };
+
+export default function AuthForm({ initialTab = "login", onClose, onSuccess }: AuthFormProps) {
+    const { login, register, authError, clearAuthError } = useAppContext();
+    const [isLoginTab, setIsLoginTab] = useState<boolean>(initialTab === "login");
+
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [phone, setPhone] = useState("");
+    const [isOwner, setIsOwner] = useState<boolean>(false);
+    const [formLoading, setFormLoading] = useState(false);
+
+    const resetForm = () => {
+        setName("");
+        setEmail("");
+        setPassword("");
+        setPhone("");
+        setIsOwner(false);
+    };
+
+    const handleDemoLogin = async (creds: { email: string; password: string }) => {
+        clearAuthError();
+        setFormLoading(true);
+        const success = await login(creds.email, creds.password);
+        setFormLoading(false);
+        if (success) {
+            resetForm();
+            onSuccess?.();
+            onClose?.();
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        clearAuthError();
+        setFormLoading(true);
+
+        let success: boolean;
+        if (isLoginTab) {
+            success = await login(email, password);
+        } else {
+            success = await register(name, email, password, phone, isOwner ? "owner" : "user");
+        }
+
+        setFormLoading(false);
+        if (success) {
+            resetForm();
+            onSuccess?.();
+            onClose?.();
+        }
+    };
+
+    return (
+        <div className="relative w-full max-w-md bg-white border border-outline-variant/30 ambient-shadow rounded-lg overflow-hidden z-10 transition-soft flex flex-col">
+            {onClose && (
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 text-black/55 hover:text-primary transition-colors cursor-pointer"
+                    aria-label="Close"
+                >
+                    <X size={20} />
+                </button>
+            )}
+
+            <div className="flex border-b border-outline-variant/20">
+                <button
+                    onClick={() => {
+                        clearAuthError();
+                        setIsLoginTab(true);
+                    }}
+                    className={`flex-1 py-5 text-center text-xs font-medium tracking-widest transition-soft cursor-pointer ${
+                        isLoginTab
+                            ? "text-primary border-b-2 border-primary bg-surface-container-lowest"
+                            : "text-black/55 hover:text-primary bg-surface-container-low/50"
+                    }`}
+                >
+                    SIGN IN
+                </button>
+                <button
+                    onClick={() => {
+                        clearAuthError();
+                        setIsLoginTab(false);
+                    }}
+                    className={`flex-1 py-5 text-center text-xs font-medium tracking-widest transition-soft cursor-pointer ${
+                        !isLoginTab
+                            ? "text-primary border-b-2 border-primary bg-surface-container-lowest"
+                            : "text-black/55 hover:text-primary bg-surface-container-low/50"
+                    }`}
+                >
+                    SIGN UP
+                </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="p-8 space-y-6 flex-1 flex flex-col justify-between">
+                <div>
+                    <div className="text-center mb-8">
+                        <h2 className="font-display text-2xl font-medium text-primary tracking-tight">
+                            {isLoginTab ? "Welcome Back" : "Welcome to QuickDine"}
+                        </h2>
+                        <p className="text-xs text-black/55 mt-2 leading-relaxed">
+                            {isLoginTab
+                                ? "Sign in to manage your reservations and dining profile."
+                                : "Create an account to access exclusive reservations."}
+                        </p>
+                    </div>
+
+                    <div className="space-y-5">
+                        {!isLoginTab && (
+                            <div className="space-y-1">
+                                <label className="block text-left text-[10px] font-medium text-black/55 tracking-wider uppercase">
+                                    FULL NAME
+                                </label>
+                                <div className="relative">
+                                    <span className="absolute inset-y-0 left-0 flex items-center pr-3 pointer-events-none text-black/55">
+                                        <User size={16} />
+                                    </span>
+                                    <input
+                                        type="text"
+                                        required={!isLoginTab}
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        placeholder="Sarah Jenkins"
+                                        className="w-full pl-7 pb-2 pt-1 text-sm bg-transparent border-b border-outline-variant/60 focus:border-secondary focus:outline-none transition-colors"
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="space-y-1">
+                            <label className="block text-left text-[10px] font-medium text-black/55 tracking-wider uppercase">
+                                EMAIL ADDRESS
+                            </label>
+                            <div className="relative">
+                                <span className="absolute inset-y-0 left-0 flex items-center pr-3 pointer-events-none text-black/55">
+                                    <Mail size={16} />
+                                </span>
+                                <input
+                                    type="email"
+                                    required
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="you@example.com"
+                                    className="w-full pl-7 pb-2 pt-1 text-sm bg-transparent border-b border-outline-variant/60 focus:border-secondary focus:outline-none transition-colors"
+                                />
+                            </div>
+                        </div>
+
+                        {!isLoginTab && (
+                            <div className="space-y-1">
+                                <label className="block text-left text-[10px] font-medium text-black/55 tracking-wider uppercase">
+                                    PHONE NUMBER (OPTIONAL)
+                                </label>
+                                <div className="relative">
+                                    <span className="absolute inset-y-0 left-0 flex items-center pr-3 pointer-events-none text-black/55">
+                                        <Phone size={16} />
+                                    </span>
+                                    <input
+                                        type="tel"
+                                        value={phone}
+                                        onChange={(e) => setPhone(e.target.value)}
+                                        placeholder="+1 (555) 000-0000"
+                                        className="w-full pl-7 pb-2 pt-1 text-sm bg-transparent border-b border-outline-variant/60 focus:border-secondary focus:outline-none transition-colors"
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="space-y-1">
+                            <label className="block text-left text-[10px] font-medium text-black/55 tracking-wider uppercase">
+                                PASSWORD
+                            </label>
+                            <div className="relative">
+                                <span className="absolute inset-y-0 left-0 flex items-center pr-3 pointer-events-none text-black/55">
+                                    <Lock size={16} />
+                                </span>
+                                <input
+                                    type="password"
+                                    required
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    className="w-full pl-7 pb-2 pt-1 text-sm bg-transparent border-b border-outline-variant/60 focus:border-secondary focus:outline-none transition-colors"
+                                />
+                            </div>
+                        </div>
+
+                        {!isLoginTab && (
+                            <div className="flex items-center gap-2.5 pt-2">
+                                <input
+                                    type="checkbox"
+                                    id="isOwner"
+                                    checked={isOwner}
+                                    onChange={(e) => setIsOwner(e.target.checked)}
+                                    className="h-4 w-4 accent-secondary rounded border-outline-variant/60 cursor-pointer"
+                                />
+                                <label htmlFor="isOwner" className="text-xs text-black/55 select-none cursor-pointer">
+                                    I am a Restaurant Owner / Manager
+                                </label>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Demo Login */}
+                    <div className="mt-6 p-3 bg-surface-container-low/60 rounded-md border border-outline-variant/20">
+                        <p className="text-[10px] font-medium tracking-wider uppercase text-black/55 mb-2 flex items-center gap-1.5">
+                            <Sparkles size={12} className="text-secondary" /> Demo Login (auto-fill)
+                        </p>
+                        <div className="flex gap-2">
+                            <button
+                                type="button"
+                                onClick={() => handleDemoLogin(DEMO_USER)}
+                                disabled={formLoading}
+                                className="flex-1 text-[10px] font-medium tracking-wider uppercase border border-outline-variant/50 hover:border-primary py-2 transition-colors cursor-pointer disabled:opacity-60"
+                            >
+                                DEMO USER
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => handleDemoLogin(DEMO_ADMIN)}
+                                disabled={formLoading}
+                                className="flex-1 text-[10px] font-medium tracking-wider uppercase border border-outline-variant/50 hover:border-primary py-2 transition-colors cursor-pointer disabled:opacity-60"
+                            >
+                                DEMO ADMIN
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mt-8">
+                    {authError && <p className="text-center text-[11px] text-error mb-4">{authError}</p>}
+                    <button
+                        type="submit"
+                        disabled={formLoading}
+                        className="w-full bg-primary hover:bg-secondary text-white py-3.5 px-4 text-xs font-medium tracking-widest uppercase focus:outline-none transition-colors disabled:opacity-75 cursor-pointer"
+                    >
+                        {formLoading ? "PROCESSING..." : isLoginTab ? "LOGIN" : "CREATE ACCOUNT"}
+                    </button>
+
+                    <p className="text-center text-[11px] text-black/55/80 mt-4 leading-relaxed">
+                        By signing in, you agree to our{" "}
+                        <a href="/about" className="underline hover:text-primary">
+                            Terms of Service
+                        </a>
+                        .
+                    </p>
+                </div>
+            </form>
+        </div>
+    );
+}
